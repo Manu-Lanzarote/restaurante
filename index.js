@@ -116,4 +116,44 @@ app.post("/api/nuevoMenu/", function (req, res) {
 //Ver archivo index.js de public para seguir el código)
 
 //Indico el puerto al que conectaré al servidor
+
+app.put("/api/editarMenu/", function (req, res) {
+  let menu = {
+    numero: req.body.numero,
+    primero: req.body.primero,
+    segundo: req.body.segundo,
+    postre: req.body.postre,
+    precio: req.body.precio,
+  };
+  db.collection("menus").updateOne(
+    { numero: menu.numero },
+    {
+      $set: {
+        primero: menu.primero,
+        segundo: menu.segundo,
+        postre: menu.postre,
+        precio: menu.precio,
+      },
+    },
+    function (err, datos) {
+      if (err !== null) {
+        res.send(err);
+      } else {
+        res.send(datos);
+      }
+    }
+  );
+});
+
+app.delete("/api/borraMenu/", function (req, res) {
+  let numero = req.body.numero;
+  db.collection("menus").deleteOne({ numero: numero }, function (err, datos) {
+    if (err !== null) {
+      res.send(err);
+    } else {
+      res.send(datos);
+    }
+  });
+});
+
 app.listen(3000);

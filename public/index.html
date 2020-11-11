@@ -14,7 +14,10 @@
     <input type="text" id="segundo" placeholder="Añade un segundo" />
     <input type="text" id="postre" placeholder="Añade un postre" />
     <input type="text" id="precio" placeholder="Añade un precio" />
-    <button onclick=" nuevoMenu()">Añadir menú</button>
+    <button onclick="nuevoMenu()">Añadir menú</button>
+    <!-- Boton para modificar -->
+    <button onclick="modificarMenu()">Modificar</button>
+    <button onclick="borrarMenu()">Borrar</button>
     <!-- Voy a index.js de public para hacer el fetch que recogerá estos datos a través de la función nuevoMenu() y los enviará al app.post del servidor -->
 
     <!-- div que recibe los document.getElementByID que enviamos desde los fetch de public index.js -->
