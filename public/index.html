@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurante</title>
+  </head>
+  <body>
+    <!-- Inputs y button para enviar nuevo menú a la db. -->
+    <!-- IMPORTANTE. No usar la etiqueta <form> ya que no se puede usar para pasar los datos al servidor a través de un fetch -->
+    <h1>Introduce un nuevo menú</h1>
+    <input type="text" id="numero" placeholder="Añade un número" />
+    <input type="text" id="primero" placeholder="Añade un primero" />
+    <input type="text" id="segundo" placeholder="Añade un segundo" />
+    <input type="text" id="postre" placeholder="Añade un postre" />
+    <input type="text" id="precio" placeholder="Añade un precio" />
+    <button onclick=" nuevoMenu()">Añadir menú</button>
+    <!-- Voy a index.js de public para hacer el fetch que recogerá estos datos a través de la función nuevoMenu() y los enviará al app.post del servidor -->
+
+    <!-- div que recibe los document.getElementByID que enviamos desde los fetch de public index.js -->
+    <div id="div1"></div>
+    <!-- Enlace a index.js de la carpeta public -->
+    <script src="./index.js"></script>
+  </body>
+</html>
