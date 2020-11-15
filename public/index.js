@@ -24,8 +24,10 @@ function buscarMenu() {
       document.getElementById("div1").innerHTML = menus;
     });
 }
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //Ahora toca ir a index.html y codear los inputs y el button que recogerán los datos de los nuevos menús que el cliente envíe desde el front. (Ver código en index.html)
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -50,6 +52,7 @@ function nuevoMenu() {
   console.log(anyadirMenu);
   //Y hago el fetch al archivo app.post("/api/nuevoMenu/" que se encuentra en el index.js del servidor
   fetch("/api/nuevoMenu/", {
+    //Método POST  (Hay que indicar el método por que no es un método GET)
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -69,14 +72,14 @@ function nuevoMenu() {
 //Modificar
 
 function modificarMenu() {
-  //Recojo los inputs
+  //Recojo los inputs. (Igual que hicimos en nuevoMenu() más arriba)
   let numero = document.getElementById("numero").value;
   let primero = document.getElementById("primero").value;
   let segundo = document.getElementById("segundo").value;
   let postre = document.getElementById("postre").value;
   let precio = document.getElementById("precio").value;
 
-  //Los meto en el objeto anyadirMenu
+  //Los meto en el objeto anyadirMenu (Igual que hicimos en nuevoMenu() más arriba)
   let anyadirMenu = {
     numero,
     primero,
@@ -84,7 +87,11 @@ function modificarMenu() {
     postre,
     precio,
   };
+
+  //Ahora hacemos un fetch a la ruta /api/editarMenu/
+  //Siempre igual: El flujo de la lógica va del servidor al index de public y de ahí al front. Por lo tanto, si voy al servidor podré ver la ruta en la que hay que hacer este fetch,    /api/editarMenu/
   fetch("/api/editarMenu/", {
+    //Método PUT  (Hay que indicar el método por que no es un método GET)
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -99,13 +106,20 @@ function modificarMenu() {
     });
 }
 
+//Y puedo probar directamente en el navegador a modificar el menú.
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 // Borrar
 function borrarMenu() {
+  //Miro en el servidor para comprobar qué es lo que recibe esta función y comprobaré que recibe el número por lo que este será el input que necesitaré obtener de index.html
   let numero = document.getElementById("numero").value;
   let borrarNumero = {
     numero,
   };
+  //Otra vez miro en el servidor para ver la ruta y hago el fetch
   fetch("/api/borraMenu/", {
+    //Método DELETE  (Hay que indicar el método por que no es un método GET)
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -120,3 +134,15 @@ function borrarMenu() {
       buscarMenu();
     });
 }
+
+//Y puedo probar directamente en el navegador a borrar el menú.
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/////////////// REFRESCAR EL FRONT AUTOMÁTICAMENTE AL INSERTAR, MODIFICAR O BORRAR DATOS //////////////////////////////
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//PARA QUE LOS DATOS SE ACTUALICEN EN EL FRONT  DIRECTAMENTE SIN TENER QUE REFRESCAR EL NAVEGADOR!!!!
+//Hay que meter el primer fetch (línea 3 del código - /api/menus método GET) en una función,(en este caso buscarMenu())
+//   Y LLAMAR A ESTA FUNCIÓN EN LA PRIMERA LÍNEA -(Ver línea 1)
+
+//Y SI LLAMO A ESTA FUNCIÓN en el último .them de cada fetch, (o donde yo quiera que se me actulice) SE ME ACTULIZARÁN LOS DATOS AUTOMÁTICAMENTE EN EL FRONT

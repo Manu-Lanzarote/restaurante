@@ -37,7 +37,7 @@ app.use(express.json());
 //SIEMPRE
 //Conectar a la base de datos
 const MongoClient = mongodb.MongoClient;
-//Guardar la base de datros
+//Guardar la base de datos
 let db;
 
 MongoClient.connect("mongodb://localhost:27017", function (err, client) {
@@ -49,8 +49,12 @@ MongoClient.connect("mongodb://localhost:27017", function (err, client) {
 });
 //Ya estamos conectados y ya tenemos todo lo que tenemos que poner SIEMPRE
 
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //Empezamos con lo que pide el ejercicio.
 // 1-  Crea una ruta GET /api/menus para obtener todos los menús...
+//NOTA. function (req,res){...} es la función típica de express
 
 app.get("/api/menus", function (req, res) {
   //...Para ello tenemos que consultar a la db a la colección     "menus"      y traernos todos los menús
@@ -84,8 +88,8 @@ app.post("/api/nuevoMenu/", function (req, res) {
     }
   });
 });
-//Reinicio el servidor y lo pruebo en postman.
 
+//Reinicio el servidor y lo pruebo en postman.
 //En postman seleccionamos POST que tiene que recibir el objeto por el BODY y en body seleccionamos RAW y en TEXT selecionamos JSON
 //Para hacer la prueba le paso un objeto que como está en JSON tendré que ponerle comillas tanto a las claves como a los valores, (a los números no hace falta).
 //Paso este objeto:
@@ -100,6 +104,7 @@ app.post("/api/nuevoMenu/", function (req, res) {
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //Antes de continuar con el resto de las rutas voy a hacer la parte del front de estas dos, así que creo la carpeta public y dentro los archivos index.html e index.js.
 
 //En el index.html enlazo el archivo index.js
@@ -109,32 +114,39 @@ app.post("/api/nuevoMenu/", function (req, res) {
     <script src="./index.js"></script>
 </body> */
 //(Ver archivo index.html)
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //Ahora nos vamos al index.js de public para hacer la petición de la ruta. Es decir, hacer el fetch.
-//Ver archivo index.js de public para seguir el código)
+//Repetiré la misma secuencia para hacer el PUT y para el DELETE
 
-//Indico el puerto al que conectaré al servidor
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 app.put("/api/editarMenu/", function (req, res) {
-  let menu = {
+  //Aquí hay que pensar qué es lo que me tiene que llegar por el body. Qué necesito poder editar un menú en concreto, qué es lo que necesito que me llegue del front para poder cambiar lo que el usuario quiere que se edite y poder ponerle los nuevos valores.
+  //En este caso, necesitaré el número del menú para poder identificar el menú que quiere cambiar el usuario y también el resto de las claves para poder introducir nuevos valores.
+
+  let nuevoMenu = {
     numero: req.body.numero,
     primero: req.body.primero,
     segundo: req.body.segundo,
     postre: req.body.postre,
     precio: req.body.precio,
   };
+  //Ahora ya tenemos un objeto con todo lo que nos llega por el body por lo que accederemos a la base de datos para hacer el cambio, (la consulta), con la función que sirve para actualizar algo, (update).
   db.collection("menus").updateOne(
-    { numero: menu.numero },
+    //A esta funciuón hay que pasarle dos cosas, primero un objeto con la clave que queremos que busque
+    { numero: nuevoMenu.numero },
+    //Y después le llegará otro objeto con $set con las claves y valores que queremos modificar.
+    //CUIDADO con escribir las claves malk, ya que no entonces no se modificarían, sino que se añadirían.
     {
       $set: {
-        primero: menu.primero,
-        segundo: menu.segundo,
-        postre: menu.postre,
-        precio: menu.precio,
+        primero: nuevoMenu.primero,
+        segundo: nuevoMenu.segundo,
+        postre: nuevoMenu.postre,
+        precio: nuevoMenu.precio,
       },
     },
+    //Y la función típica de mongo
     function (err, datos) {
       if (err !== null) {
         res.send(err);
@@ -145,8 +157,30 @@ app.put("/api/editarMenu/", function (req, res) {
   );
 });
 
+//Ahora reinicio el servidor y lo pruebo.
+//Primero me voy a robo 3T para buscar un número de menú para modificarlo.
+//Luego voy a postman, selecciono put/body/raw/JSON a la ruta /api/editarMenu/ e introduzco el objeto que queremos mandarle introduciendo en este caso por ejemplo el número de menú y después los nuevos valores que queremos modificar:
+// {
+//   "numero": 2,
+//   "primero": "Patatas",
+//   "segundo": "huevos",
+//   "postre": "tarta",
+//   "precio": 12
+// }
+//Ahora si voy a robo 3T comprobaré que mi menú número 2 ha cambiado con los nuevos datos.
+//(RECORDAR ACTUALIZAR ROBO 3T CON comando+R)
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//Ruta delete
+//Igual que con el PUT tenemos que decirle a express qué queremos que nos llegue para identificar un menú en la base de datos.
+//Y a diferencia del PUT no necesitamos indicar ninguna clave y valor más ya que lo que vamos a hacer es borrar es menú en concreto:
+
 app.delete("/api/borraMenu/", function (req, res) {
+  //Primero pasamos el número de menú
   let numero = req.body.numero;
+  //Y espués accedemos a la base de datos para borrarlo con la función deleteOne a la que hay que pasarle una clave y el valor numero y después, igual que en el updateOne de antes, le llega la función de mongo que es que recibe esta clave y valor y lo borra.
   db.collection("menus").deleteOne({ numero: numero }, function (err, datos) {
     if (err !== null) {
       res.send(err);
@@ -155,5 +189,22 @@ app.delete("/api/borraMenu/", function (req, res) {
     }
   });
 });
+
+//Y ya podemos probarlo en postman.
+//Reinicio eo servidor, me voy a postman   /api/borraMenu/   selecciono DELETE/Body/raw/JSON  y le paso el número del menú que quiero borrar. P. ejemplo:
+// {
+//   "numero": 2          (SIN coma al final)
+// }
+
+//Y después, si refresco robo 3T comprobaré que ya no lo tengo.
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//Ahora ya podemos hacer la parte del front del PUT y del DELETE
+
+//Para el PUT, (función updateOne de mongo) necesito 5 inputs text para introducir los cambios, QUE YA tengo creados, así que solo necesitaré un botón para llamar a la función modificarMenu() que crearé en el index.js de public
+
+//Para el input, (función deleteOne de mongo), solo necesitaré el botón para llamar a la función borrar menú que también va en el index.js de public
 
 app.listen(3000);
