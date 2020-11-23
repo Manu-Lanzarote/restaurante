@@ -15,6 +15,27 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+//CREAR BASE DE DATOS EN ROBO 3T
+//New Connection --->  Botón derecho --->  Create Database ---> Database Name/Create  (p.ej: restaurante)
+//Y restaurante aparecerá en la barra lateral.
+
+//restaurante ---> collections ---> Botón derecho ---> Create collection (p.ej: menus)
+//Y ya tenemos una base de datos vacía
+
+//menus ---> Botón derecho ---> Insert Document ---> Para crear el primer objeto de la db
+//P.ej:
+// {
+//   "numero": 1,
+//   "primero": "arroz",
+//   "postre": "flan"
+// }
+//Formato JSON. Claves y valores entre comillas. Números no.
+
+//Refrescar base de datos: comando+R ó  New Connection ---> Refresh
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //SIEMPRE:
 //En el terminal instalar el archivo package.jsonl, instalar express e instalar mongodb
 //npm init -y
