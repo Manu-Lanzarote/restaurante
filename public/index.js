@@ -1,6 +1,13 @@
+//Buscar los menús disponibles en la db sin hacer ningún tipo de filtro
+
+//////////////////
 buscarMenu();
+///Llamo aquí a la función menú para refrescar automáticamente los datos cuando busco un menú.
+//TAMBIÉN REFRESCO AÑADIR, EDITAR Y BORRAR LLAMANDO A esta función en los .then que hay al final de cada fetch
+/////////////////
+
 function buscarMenu() {
-  fetch("/api/menus") //Nota. Por defecto el fetch es get
+  fetch("/api/menus") //Nota. Por defecto el fetch es get. Nota. Recuerda que get no puede recibir datos por el body. Solo los recibe por parámetros.
     //Esto siempre igual hasta el console log.
     .then(function (respuesta) {
       return respuesta.json();
@@ -26,13 +33,40 @@ function buscarMenu() {
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//FUNCIÓN BUSCAR MENÚS HACIENDO FILTROS CON LAS PREFERENCIAS DEL USUARIO haciendo fetch al archivo
+//app.get("/seleccionar/:primero/:segundo/:postre/"... para pasarle los parámetros que el usuario desee introducir para hacer la búsqueda.
+
+function menuUsuario() {
+  //Recojo los inputs que crearé en HTML (y que también me servirán para modificar los menús o borrarlos)
+  //En esta función solo voy a permitir que el usuario introduzca primero, segundo y postre
+  let primero = document.getElementById("userPrimero").value;
+  let segundo = document.getElementById("userSegundo").value;
+  let postre = document.getElementById("userPostre").value;
+  //Y ahora hago un fetch a la url "/seleccionar/:primero/:segundo/:postre/" introduciendo las variable anteriores para buscar los datos solicitados por el usuario en el servidor
+  fetch(`/seleccionar/${primero}/${segundo}/${postre}/`)
+    .then(function (respuesta) {
+      return respuesta.json();
+    })
+    .then(function (datos) {
+      console.log(datos);
+      let menu = "";
+      for (let i = 0; i < datos.length; i++) {
+        menu += `
+        <h1>${datos[i].numero}</h1>
+        <p>${datos[i].primero}</p>
+        <p>${datos[i].segundo}</p>
+        <p>${datos[i].postre}</p>
+        `;
+      }
+      //Y los imprimo en pantalla en el div con id div1 que tengo en el html
+      document.getElementById("div1").innerHTML = menu;
+    });
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-//Ahora toca ir a index.html y codear los inputs y el button que recogerán los datos de los nuevos menús que el cliente envíe desde el front. (Ver código en index.html)
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//Despues regresaré aquí para hacer un fetch dentro de la función nuevoMenu() que llamo desde el onclick del button para que recoja los inputs del index.html y los mande al app.post del servidor para que los añada a la base de datos.
+//Hacer un fetch dentro de la función nuevoMenu() que llamo desde el onclick del button para que recoja los inputs del index.html y los mande al app.post del servidor para que los añada a la base de datos.
 function nuevoMenu() {
   //Recojo los inputs
   let numero = document.getElementById("numero").value;
@@ -64,8 +98,12 @@ function nuevoMenu() {
     })
     .then(function (datos) {
       console.log(datos);
+      //Para refrescar la pantalla automáticamente (explicación arriba!)
+      buscarMenu();
     });
 }
+
+//Ahora toca ir a index.html y codear los inputs y el button que recogerán los datos de los nuevos menús que el cliente envíe desde el front. (Ver código en index.html)
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -103,6 +141,8 @@ function modificarMenu() {
     })
     .then(function (datos) {
       console.log(datos);
+      //Para refrescar la pantalla automáticamente (explicación arriba!)
+      buscarMenu();
     });
 }
 
@@ -131,6 +171,7 @@ function borrarMenu() {
     })
     .then(function (datos) {
       console.log(datos);
+      //Para refrescar la pantalla automáticamente (explicación arriba!)
       buscarMenu();
     });
 }

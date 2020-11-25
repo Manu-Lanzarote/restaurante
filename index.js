@@ -37,10 +37,12 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //SIEMPRE:
-//En el terminal instalar el archivo package.jsonl, instalar express e instalar mongodb
+//En el terminal instalar el archivo package.json, instalar express e instalar mongodb
 //npm init -y
 //npm install express
 //npm install mongodb
+
+//Creo el archivo index.js
 
 //SIEMPRE
 //Importo express e importo mongodb
@@ -54,6 +56,8 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 //Para que el servidor sepa interpretar le JSON que llega al body dentro del app.post.
 app.use(express.json());
+
+//Recuerda codear también:   app.listen(3000) !! - Insertar todo el código antes de esta línea para que quede la última.
 
 //SIEMPRE
 //Conectar a la base de datos
@@ -69,6 +73,7 @@ MongoClient.connect("mongodb://localhost:27017", function (err, client) {
   }
 });
 //Ya estamos conectados y ya tenemos todo lo que tenemos que poner SIEMPRE
+//No olvidar encender el servidor en el terminal con node index.js y comprobar en el navegador la conexión
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -90,7 +95,73 @@ app.get("/api/menus", function (req, res) {
       }
     });
 });
-//Ahora inicio el servidor y lo compruebo en postman en la dirección localhost:3000/api/menus  - GET
+//Ahora REINICIO el servidor y lo compruebo en postman en la dirección localhost:3000/api/menus  - GET
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+////ENTENDIENDO COMO SE CONECTA LA BASE DE DATOS CON EL SERVIDOR PARA HACER CUALQUIER TIPO DE BÚSQUEDA, (Más info en manual del módulo 2 ---> mongodb introducción ---> pagina 20)
+//En el código anterior me conecto a
+//db.collection("menus")
+//Y dejo el .find() vacío para que me devuelva todos los menús
+
+//Pero si quiero FILTRAR DATOS tengo que usar básicamente los $or y los $and para preguntar a la db lo que quiero que me devuelva.
+
+//ASÍ, SI ME VOY A ROBO 3T y hago, por ejemplo, esta búsqueda:
+//db.getCollection('menus').find({and:[{primero: "arroz"},{postre:"flan"}]})
+//Para encontrar los menús que tengan de primero "arroz" Y de postre "flan" , la base de datos me devolverá los documentos que cumplan con esas condiciones. DE IGUAL MANERA LO PUEDO USAR para buscar mayores que con $gt o menores que $lt (Ver manual)
+
+// LO QUE HAY QUE HACER ES INTRODUCIR LO QUE HAY DENTRO DEL find() de mongodb EN EL find() del app.get que antes esteba vacío para poder sacar el menú.
+//En este caso habría que extraer de:
+//db.getCollection('menus').find({and:[{primero: "arroz"},{postre:"flan"}]})
+//Lo que está dentro del find(),
+//que es:    {and:[{primero: "arroz"},{postre:"flan"}]}
+//E INSERTARLO en el find() del app.get (cambiando la ruta de antes para ver los resultados)
+
+app.get("/api/busqueda", function (req, res) {
+  db.collection("menus")
+    .find({ and: [{ primero: "arroz" }, { postre: "flan" }] }) ////// (Aquí está la magia, el mismo código que mongodb)
+    .toArray(function (err, datos) {
+      if (err !== null) {
+        res.send(err);
+      } else {
+        res.send(datos);
+      }
+    });
+});
+
+//Ahora REINICIO el servidor y lo compruebo en postman en la dirección localhost:3000/api/busqueda  - GET
+
+///////// Y ASÍ ES COMO SE CONECTA EL SERVIDOR CON LA DB PARA HACER UNA BUSQUEDA CON FILTRO /////////////////////////
+///// AHORA HAY QUE HACER QUE  { primero: "arroz" }, { postre: "flan" } NO SEAN FIJOS, SINO QU ENTREN POR PARÁMETROS.
+
+//Por ejemplo, creo esta ruta para pasarle por parámetros el primer, el segundo, el postre y los precios
+
+app.get("/seleccionar/:primero/:segundo/:postre/", function (req, res) {
+  let primero = req.params.primero;
+  let segundo = req.params.segundo;
+  let postre = req.params.postre;
+
+  db.collection("menus")
+    //Y paso las variables al find()
+    .find({
+      //En este caso le pido que me devuelva el primero "O" el segundo "Y" el postre que elija el usuario
+      $or: [{ primero: `${primero}` }, { segundo: `${segundo}` }],
+      $and: [{ postre: `${postre}` }],
+    })
+    .toArray(function (err, datos) {
+      if (err !== null) {
+        res.send(err);
+      } else {
+        res.send(datos);
+      }
+    });
+});
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//Sigo con el ejercicio..
 
 // 2-  Crea una ruta POST /api/nuevoMenu para añadir un nuevo menú. Desde el navegador manda un objeto con las 5 propiedades y, en el servidor, introduce ese objeto en la base de datos.
 //Esta ruta va a recibir un objeto que crearemos después a partir de los inputs type text que insertaremos en el front y que el usuario enviará a través de un button onclick que llamará a a la función nuevoMenu()

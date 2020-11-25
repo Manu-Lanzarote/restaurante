@@ -6,6 +6,17 @@
     <title>Restaurante</title>
   </head>
   <body>
+    <!-- Inputs y button para que el usuario seleccione su menú -->
+    <!-- Envía los datos a la función menuUsuario() que busca los resultados en la db con un
+      fetch /seleccionar/${primero}/${segundo}/${postre}/ -->
+
+    <!-- OJO!!! Los ids no pueden ser los mismos que otros ids que tengamos en otros inputs!!! -->
+    <h1>Selecciona tu menú</h1>
+    <input type="text" id="userPrimero" placeholder="Añade un primero" />
+    <input type="text" id="userSegundo" placeholder="Añade un segundo" />
+    <input type="text" id="userPostre" placeholder="Añade un postre" />
+    <button onclick="menuUsuario()">Ver menús</button>
+
     <!-- Inputs y button para enviar nuevo menú a la db. -->
     <!-- IMPORTANTE. No usar la etiqueta <form> ya que no se puede usar para pasar los datos al servidor a través de un fetch -->
     <h1>Introduce un nuevo menú</h1>
